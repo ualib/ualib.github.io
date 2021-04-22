@@ -16,6 +16,9 @@ module Algebras.Congruences where
 
 open import Algebras.Products public
 
+module congruences {𝑆 : Signature 𝓞 𝓥} where
+ open products {𝑆 = 𝑆} public
+
 \end{code}
 
 A *congruence relation* of an algebra `𝑨` is defined to be an equivalence relation that is compatible with the basic operations of `𝑨`.  This concept can be represented in a number of alternative but equivalent ways.
@@ -23,18 +26,13 @@ Formally, we define a record type (`IsCongruence`) to represent the property of 
 
 \begin{code}
 
-module congruences {𝑆 : Signature 𝓞 𝓥} where
- open products {𝑆 = 𝑆} public
+ record IsCongruence (𝑨 : Algebra 𝓤 𝑆)(θ : Rel ∣ 𝑨 ∣ 𝓦) : Set(ov 𝓦 ⊔ 𝓤)  where
+  constructor mkcon
+  field       is-equivalence : IsEquivalence θ
+              is-compatible  : compatible 𝑨 θ
 
- module _ {𝓦 𝓤 : Level} where
-
-  record IsCongruence (𝑨 : Algebra 𝓤 𝑆)(θ : Rel ∣ 𝑨 ∣ 𝓦) : Set(ov 𝓦 ⊔ 𝓤)  where
-   constructor mkcon
-   field       is-equivalence : IsEquivalence θ
-               is-compatible  : compatible 𝑨 θ
-
-  Con : (𝑨 : Algebra 𝓤 𝑆) → Set(𝓤 ⊔ ov 𝓦)
-  Con 𝑨 = Σ θ ꞉ ( Rel ∣ 𝑨 ∣ 𝓦 ) , IsCongruence 𝑨 θ
+ Con : (𝑨 : Algebra 𝓤 𝑆) → Set(𝓤 ⊔ ov 𝓦)
+ Con {𝓤}{𝓦} 𝑨 = Σ θ ꞉ ( Rel ∣ 𝑨 ∣ 𝓦 ) , IsCongruence 𝑨 θ
 
 
 \end{code}
@@ -43,11 +41,11 @@ Each of these types captures what it means to be a congruence and they are equiv
 
 \begin{code}
 
-  IsCongruence→Con : {𝑨 : Algebra 𝓤 𝑆}(θ : Rel ∣ 𝑨 ∣ 𝓦) → IsCongruence 𝑨 θ → Con 𝑨
-  IsCongruence→Con θ p = θ , p
+ IsCongruence→Con : {𝑨 : Algebra 𝓤 𝑆}(θ : Rel ∣ 𝑨 ∣ 𝓦) → IsCongruence 𝑨 θ → Con 𝑨
+ IsCongruence→Con θ p = θ , p
 
-  Con→IsCongruence : {𝑨 : Algebra 𝓤 𝑆} → ((θ , _) : Con 𝑨) → IsCongruence 𝑨 θ
-  Con→IsCongruence θ = ∥ θ ∥
+ Con→IsCongruence : {𝑨 : Algebra 𝓤 𝑆} → ((θ , _) : Con{𝓤}{𝓦} 𝑨) → IsCongruence 𝑨 θ
+ Con→IsCongruence θ = ∥ θ ∥
 
 \end{code}
 
@@ -93,12 +91,10 @@ In many areas of abstract mathematics the *quotient* of an algebra `𝑨` with r
 
 \begin{code}
 
- module _ {𝓤 𝓦 : Level} where
+ _╱_ : (𝑨 : Algebra 𝓤 𝑆) → Con{𝓤}{𝓦} 𝑨 → Algebra (𝓤 ⊔ lsuc 𝓦) 𝑆
 
-  _╱_ : (𝑨 : Algebra 𝓤 𝑆) → Con{𝓦} 𝑨 → Algebra (𝓤 ⊔ lsuc 𝓦) 𝑆
-
-  𝑨 ╱ θ = (∣ 𝑨 ∣ / ∣ θ ∣)  ,                               -- the domain of the quotient algebra
-          λ 𝑓 𝑎 → ⟪ (𝑓 ̂ 𝑨)(λ i →  fst ∥ 𝑎 i ∥) ⟫           -- the basic operations of the quotient algebra
+ 𝑨 ╱ θ = (∣ 𝑨 ∣ / ∣ θ ∣)  ,                               -- the domain of the quotient algebra
+         λ 𝑓 𝑎 → ⟪ (𝑓 ̂ 𝑨)(λ i →  fst ∥ 𝑎 i ∥) ⟫           -- the basic operations of the quotient algebra
 
 \end{code}
 
@@ -107,8 +103,8 @@ In many areas of abstract mathematics the *quotient* of an algebra `𝑨` with r
 \begin{code}
 
 
-  𝟘[_╱_] : (𝑨 : Algebra 𝓤 𝑆)(θ : Con {𝓦} 𝑨) → Rel (∣ 𝑨 ∣ / ∣ θ ∣)(𝓤 ⊔ lsuc 𝓦)
-  𝟘[ 𝑨 ╱ θ ] = λ u v → u ≡ v
+ 𝟘[_╱_] : (𝑨 : Algebra 𝓤 𝑆)(θ : Con{𝓤}{𝓦} 𝑨) → Rel (∣ 𝑨 ∣ / ∣ θ ∣)(𝓤 ⊔ lsuc 𝓦)
+ 𝟘[ 𝑨 ╱ θ ] = λ u v → u ≡ v
 
 \end{code}
 
@@ -116,8 +112,8 @@ From this we easily obtain the zero congruence of `𝑨 ╱ θ` by applying the 
 
 \begin{code}
 
-  𝟎[_╱_] : (𝑨 : Algebra 𝓤 𝑆)(θ : Con{𝓦} 𝑨){fe : funext 𝓥 (𝓤 ⊔ lsuc 𝓦)} → Con (𝑨 ╱ θ)
-  𝟎[ 𝑨 ╱ θ ] {fe} = 𝟘[ 𝑨 ╱ θ ] , Δ (𝑨 ╱ θ) {fe}
+ 𝟎[_╱_] : (𝑨 : Algebra 𝓤 𝑆)(θ : Con{𝓤}{𝓦} 𝑨){fe : funext 𝓥 (𝓤 ⊔ lsuc 𝓦)} → Con (𝑨 ╱ θ)
+ 𝟎[ 𝑨 ╱ θ ] {fe} = 𝟘[ 𝑨 ╱ θ ] , Δ (𝑨 ╱ θ) {fe}
 
 \end{code}
 
@@ -126,10 +122,10 @@ Finally, the following elimination rule is sometimes useful.
 
 \begin{code}
 
- module _ {𝓤 𝓦 : Level}{𝑨 : Algebra 𝓤 𝑆} where
+ module _ {𝑨 : Algebra 𝓤 𝑆} where
   open IsCongruence
 
-  /-≡ : (θ : Con{𝓦} 𝑨){u v : ∣ 𝑨 ∣} → ⟪ u ⟫ {∣ θ ∣} ≡ ⟪ v ⟫ → ∣ θ ∣ u v
+  /-≡ : (θ : Con{𝓤}{𝓦} 𝑨){u v : ∣ 𝑨 ∣} → ⟪ u ⟫ {∣ θ ∣} ≡ ⟪ v ⟫ → ∣ θ ∣ u v
   /-≡ θ refl = IsEquivalence.rfl (is-equivalence ∥ θ ∥)
 
 \end{code}

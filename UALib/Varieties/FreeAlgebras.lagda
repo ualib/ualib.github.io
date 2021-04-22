@@ -16,7 +16,6 @@ First we will define the relatively free algebra in a variety, which is the "fre
 {-# OPTIONS --without-K --exact-split --safe #-}
 
 module Varieties.FreeAlgebras where
- --{𝑆 : Signature 𝓞 𝓥} {𝓤 : Universe}{X : 𝓤 ̇}
 
 open import Varieties.Preservation public
 
@@ -197,7 +196,7 @@ First, we represent the congruence relation `ψCon`, modulo which `𝑻 X` yield
   ψlemma0-ap {𝑨}{h} skA {p , q} x = γ where
 
    ν : ∣ homℭ ∣ p ≡ ∣ homℭ ∣ q
-   ν = ker-in-con {ov 𝓤}{ov 𝓤}{𝑻 X}{fe 𝓥 𝓕⁺}(kercon ℭ {fe 𝓥 𝓕} homℭ) {p}{q} x
+   ν = ker-in-con {fe = fe 𝓥 𝓕⁺}(kercon ℭ {fe 𝓥 𝓕} homℭ) {p}{q} x
 
    γ : (free-lift 𝑨 h) p ≡ (free-lift 𝑨 h) q
    γ = ((ψlemma0 p q) ν) 𝑨 skA h
@@ -279,13 +278,13 @@ First, we represent the congruence relation `ψCon`, modulo which `𝑻 X` yield
 
 
   ψlemma3 : ∀ p q → (p , q) ∈ ψ 𝒦 → 𝒦 ⊧ p ≋ q
-  ψlemma3 p q pψq {𝑨} kA = γ
+  ψlemma3 p q pψq {𝑨} kA a = γ
     where
-    γ : 𝑨 ⟦ p ⟧ ≡ 𝑨 ⟦ q ⟧
-    γ = fe 𝓤 𝓤 λ h → (𝑨 ⟦ p ⟧) h    ≡⟨ free-lift-interp (fe 𝓥 𝓤) 𝑨 h p ⟩
-                  (free-lift 𝑨 h) p ≡⟨ pψq 𝑨 (siso (sbase kA) (≅-sym Lift-≅)) h ⟩
-                  (free-lift 𝑨 h) q ≡⟨ (free-lift-interp (fe 𝓥 𝓤) 𝑨 h q)⁻¹  ⟩
-                  (𝑨 ⟦ q ⟧) h       ∎
+    γ : 𝑨 ⟦ p ⟧ a ≡ 𝑨 ⟦ q ⟧ a
+    γ = 𝑨 ⟦ p ⟧ a    ≡⟨ free-lift-interp (fe 𝓥 𝓤) 𝑨 a p ⟩
+        (free-lift 𝑨 a) p ≡⟨ pψq 𝑨 (siso (sbase kA) (≅-sym Lift-≅)) a ⟩
+        (free-lift 𝑨 a) q ≡⟨ (free-lift-interp (fe 𝓥 𝓤) 𝑨 a q)⁻¹  ⟩
+        𝑨 ⟦ q ⟧ a       ∎
 
  \end{code}
 
@@ -296,9 +295,6 @@ First, we represent the congruence relation `ψCon`, modulo which `𝑻 X` yield
   class-models-kernel : ∀ p q → (p , q) ∈ kernel ∣ hom𝔽 ∣ → 𝒦 ⊧ p ≋ q
   class-models-kernel p q hyp = ψlemma3 p q (ψlemma2 hyp)
 
- \end{code}
-
- \begin{code}
 
   𝕍𝒦 : Pred (Algebra 𝓕⁺ 𝑆) (lsuc 𝓕⁺)
   𝕍𝒦 = V{𝓤}{𝓕⁺} 𝒦
@@ -323,8 +319,8 @@ First, we represent the congruence relation `ψCon`, modulo which `𝑻 X` yield
 
    kerincl : kernel ∣ hom𝔽 ∣ ⊆ kernel ∣ φ ∣
    kerincl {p , q} x = ∣ φ ∣ p      ≡⟨ (free-lift-interp (fe 𝓥 𝓕⁺) 𝑨 η p)⁻¹ ⟩
-                       (𝑨 ⟦ p ⟧) η  ≡⟨ happly (pqlem2 p q x) η  ⟩
-                       (𝑨 ⟦ q ⟧) η  ≡⟨ free-lift-interp (fe 𝓥 𝓕⁺) 𝑨 η q ⟩
+                       𝑨 ⟦ p ⟧ η  ≡⟨ (pqlem2 p q x) η  ⟩
+                       𝑨 ⟦ q ⟧ η  ≡⟨ free-lift-interp (fe 𝓥 𝓕⁺) 𝑨 η q ⟩
                        ∣ φ ∣ q      ∎
 
    γ : epi 𝔽 𝑨
@@ -439,7 +435,7 @@ From these it follows that every equational class is a variety. Thus, our formal
 
 
 
-<!--
+<!-- UNUSED STUFF ------------------------------------------------------------------------------------------------------------------
 
 <sup>2</sup><span class="footnote" id="fn2"> In the previous version of the [UALib][] this section was part of a module called HSPTheorem module.</span>
 

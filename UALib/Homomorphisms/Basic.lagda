@@ -33,7 +33,7 @@ To formalize this concept, we first define a type representing the assertion tha
 
 \begin{code}
 
- module _ {𝓤 𝓦 : Level}(𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆) where
+ module _ (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆) where
 
   compatible-op-map : ∣ 𝑆 ∣ → (∣ 𝑨 ∣ → ∣ 𝑩 ∣) → Set(𝓤 ⊔ 𝓥 ⊔ 𝓦)
   compatible-op-map 𝑓 h = ∀ 𝑎 → h ((𝑓 ̂ 𝑨) 𝑎) ≡ (𝑓 ̂ 𝑩) (h ∘ 𝑎)
@@ -143,7 +143,7 @@ It is convenient to define a function that takes a homomorphism and constructs a
 
 \begin{code}
 
-  kercon : (𝑩 : Algebra 𝓦 𝑆){fe : dfunext 𝓥 𝓦} → hom 𝑨 𝑩 → Con{𝓦} 𝑨
+  kercon : (𝑩 : Algebra 𝓦 𝑆){fe : dfunext 𝓥 𝓦} → hom 𝑨 𝑩 → Con 𝑨
   kercon 𝑩 {fe} h = ker ∣ h ∣ , mkcon (ker-IsEquivalence ∣ h ∣)(homker-compatible fe 𝑩 h)
 
 \end{code}
@@ -173,8 +173,8 @@ Given an algebra `𝑨` and a congruence `θ`, the *canonical projection* is a m
 
 \begin{code}
 
- module _ {𝓤 𝓦 : Level}{𝑨 : Algebra 𝓤 𝑆} where
-  πepi : (θ : Con{𝓦} 𝑨) → epi 𝑨 (𝑨 ╱ θ)
+ module _ {𝑨 : Algebra 𝓤 𝑆} where
+  πepi : (θ : Con{𝓤}{𝓦} 𝑨) → epi 𝑨 (𝑨 ╱ θ)
   πepi θ = (λ a → ⟪ a ⟫) , (λ _ _ → refl) , cπ-is-epic  where
    cπ-is-epic : Epic (λ a → ⟪ a ⟫)
    cπ-is-epic (C , (a , refl)) =  Image_∋_.im a
@@ -185,7 +185,7 @@ In may happen that we don't care about the surjectivity of `πepi`, in which cas
 
 \begin{code}
 
-  πhom : (θ : Con{𝓦} 𝑨) → hom 𝑨 (𝑨 ╱ θ)
+  πhom : (θ : Con{𝓤}{𝓦} 𝑨) → hom 𝑨 (𝑨 ╱ θ)
   πhom θ = epi-to-hom (𝑨 ╱ θ) (πepi θ)
 
 \end{code}
@@ -206,7 +206,7 @@ The kernel of the canonical projection of `𝑨` onto `𝑨 / θ` is equal to `�
 
   open IsCongruence
 
-  ker-in-con : {fe : dfunext 𝓥 (𝓤 ⊔ lsuc 𝓦)}(θ : Con{𝓦} 𝑨)
+  ker-in-con : {fe : dfunext 𝓥 (𝓤 ⊔ lsuc 𝓦)}(θ : Con{𝓤}{𝓦} 𝑨)
    →           ∀ {x}{y} → ∣ kercon (𝑨 ╱ θ){fe} (πhom θ) ∣ x y →  ∣ θ ∣ x y
 
   ker-in-con θ hyp = /-≡ θ hyp
@@ -223,7 +223,7 @@ If in addition we have a family `𝒽 : (i : I) → hom 𝑨 (ℬ i)` of homomor
 
 \begin{code}
 
- module _ {𝓘 𝓦 : Level}{I : Set 𝓘}(ℬ : I → Algebra 𝓦 𝑆) where
+ module _ {𝓘 : Level}{I : Set 𝓘}(ℬ : I → Algebra 𝓦 𝑆) where
 
   ⨅-hom-co : dfunext 𝓘 𝓦 → {𝓤 : Level}(𝑨 : Algebra 𝓤 𝑆) → Π i ꞉ I , hom 𝑨 (ℬ i) → hom 𝑨 (⨅ ℬ)
   ⨅-hom-co fe 𝑨 𝒽 = (λ a i → ∣ 𝒽 i ∣ a) , (λ 𝑓 𝒶 → fe λ i → ∥ 𝒽 i ∥ 𝑓 𝒶)
@@ -281,67 +281,3 @@ Recall, `h ∘ 𝒂` is the tuple whose i-th component is `h (𝒂 i)`.</span>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-θ is contained in the kernel of the canonical projection onto 𝑨 / θ.
-con-in-ker : {𝓤 𝓦 : Level}(𝑨 : Algebra 𝓤 𝑆) (θ : Congruence{𝓤}{𝓦} 𝑨)
- → ∀ x y → (⟨ θ ⟩ x y) → (⟨ (kercon 𝑨 {𝑨 ╱ θ} (canonical-hom{𝓤}{𝓦} 𝑨 θ)) ⟩ x y)
-con-in-ker 𝑨 θ x y hyp = γ
- where
-  h : hom 𝑨 (𝑨 ╱ θ)
-  h = canonical-hom 𝑨 θ
-
-  κ : Congruence 𝑨
-  κ = kercon 𝑨 {𝑨 ╱ θ} h
-
-  γ : ⟪ x ⟧ {⟨ θ ⟩}≡ ⟪ y ⟫{⟨ θ ⟩}
-  γ = {!!}
--->
-
-
-
-<!-- The definition of homomorphism in the [Agda UALib][] is an *extensional* one; that is, the homomorphism condition holds pointwise. Generally speaking, we say that two functions 𝑓 𝑔 : X → Y are extensionally equal iff they are pointwise equal, that is, for all x : X we have 𝑓 x ≡ 𝑔 x. -->
-
-
-
-
-<!--
-
-#### <a id="equalizers-in-agda">Equalizers</a>
-
-Recall, the equalizer of two functions (resp., homomorphisms) `g h : A → B` is the subset of `A` on which the values of the functions `g` and `h` agree.  We define the equalizer of functions and homomorphisms in Agda as follows.
-
-module _ {𝓤 𝓦 : Level}{𝑨 : Algebra 𝓤 𝑆} where
-
- 𝐸 : (𝑩 : Algebra 𝓦 𝑆) → (∣ 𝑨 ∣ → ∣ 𝑩 ∣) → (∣ 𝑨 ∣ → ∣ 𝑩 ∣) → Pred ∣ 𝑨 ∣ 𝓦
- 𝐸 _ g h x = g x ≡ h x
-
- 𝐸hom : (𝑩 : Algebra 𝓦 𝑆) → hom 𝑨 𝑩 → hom 𝑨 𝑩 → Pred ∣ 𝑨 ∣ 𝓦
- 𝐸hom _ g h x = ∣ g ∣ x ≡ ∣ h ∣ x
-
-We will define subuniverses in the [Subalgebras.Subuniverses] module, but we note here that the equalizer of homomorphisms from `𝑨` to `𝑩` will turn out to be subuniverse of `𝑨`.  Indeed, this is easily proved as follows.
-
- 𝐸hom-closed : dfunext 𝓥 𝓦 → (𝑩 : Algebra 𝓦 𝑆)(g h : hom 𝑨 𝑩)
-   →           ∀ 𝑓 a  →  Π x ꞉ ∥ 𝑆 ∥ 𝑓 , (a x ∈ 𝐸hom 𝑩 g h)
-               ----------------------------------------------
-   →           ∣ g ∣ ((𝑓 ̂ 𝑨) a) ≡ ∣ h ∣ ((𝑓 ̂ 𝑨) a)
-
- 𝐸hom-closed fe 𝑩 g h 𝑓 a p = ∣ g ∣ ((𝑓 ̂ 𝑨) a)   ≡⟨ ∥ g ∥ 𝑓 a ⟩
-                              (𝑓 ̂ 𝑩)(∣ g ∣ ∘ a)  ≡⟨ ap (𝑓 ̂ 𝑩)(fe p) ⟩
-                              (𝑓 ̂ 𝑩)(∣ h ∣ ∘ a)  ≡⟨ (∥ h ∥ 𝑓 a)⁻¹ ⟩
-                              ∣ h ∣ ((𝑓 ̂ 𝑨) a)   ∎
-
-
-The typing judgments for the arguments that we left implicit are `𝑓 : ∣ 𝑆 ∣` and `𝑎 : ∥ 𝑆 ∥ 𝑓 → ∣ 𝑨 ∣`.
--->

@@ -30,11 +30,11 @@ Given algebras `𝑨 : Algebra 𝓤 𝑆` and `𝑩 : Algebra 𝓦 𝑆`, we say
 
 \begin{code}
 
- _IsSubalgebraOf_ : {𝓦 𝓤 : Level}(𝑩 : Algebra 𝓦 𝑆)(𝑨 : Algebra 𝓤 𝑆) → Set(𝓞 ⊔ 𝓥 ⊔ 𝓤 ⊔ 𝓦)
+ _IsSubalgebraOf_ : (𝑩 : Algebra 𝓦 𝑆)(𝑨 : Algebra 𝓤 𝑆) → Set(𝓞 ⊔ 𝓥 ⊔ 𝓤 ⊔ 𝓦)
  𝑩 IsSubalgebraOf 𝑨 = Σ h ꞉ hom 𝑩 𝑨 , is-embedding ∣ h ∣
 
- Subalgebra : {𝓦 𝓤 : Level} → Algebra 𝓤 𝑆 → Set(ov 𝓦 ⊔ 𝓤)
- Subalgebra {𝓦} 𝑨 = Σ 𝑩 ꞉ (Algebra 𝓦 𝑆) , 𝑩 IsSubalgebraOf 𝑨
+ Subalgebra : Algebra 𝓤 𝑆 → Set(ov 𝓦 ⊔ 𝓤)
+ Subalgebra {𝓤}{𝓦} 𝑨 = Σ 𝑩 ꞉ (Algebra 𝓦 𝑆) , 𝑩 IsSubalgebraOf 𝑨
 
 \end{code}
 
@@ -49,24 +49,14 @@ We take this opportunity to prove an important lemma that makes use of the `IsSu
 
 \begin{code}
 
- module _ {𝓤 𝓦 : Level}(𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩)
-          -- extensionality assumptions:
-          (pe : pred-ext 𝓤 𝓦)(fe : dfunext 𝓥 𝓦)
+ FirstHomCorollary|Set : (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩)
+    (pe : pred-ext 𝓤 𝓦)(fe : dfunext 𝓥 𝓦)                            -- extensionality assumptions
+    (Bset : is-set ∣ 𝑩 ∣)(buip : blk-uip ∣ 𝑨 ∣ ∣ kercon 𝑩 {fe} h ∣)  -- truncation assumptions
+    ----------------------------------------------------------------
+  → (𝑨 [ 𝑩 ]/ker h ↾ fe) IsSubalgebraOf 𝑩
 
-          -- truncation assumptions:
-          (Bset : is-set ∣ 𝑩 ∣)
-          (buip : blk-uip ∣ 𝑨 ∣ ∣ kercon 𝑩 {fe} h ∣)
-          where
-
-  FirstHomCorollary|Set : (𝑨 [ 𝑩 ]/ker h ↾ fe) IsSubalgebraOf 𝑩
-  FirstHomCorollary|Set = ϕhom , ϕemb
-   where
-   hh = FirstHomTheorem|Set 𝑨 𝑩 h pe fe Bset buip
-   ϕhom : hom (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩
-   ϕhom = ∣ hh ∣
-
-   ϕemb : is-embedding ∣ ϕhom ∣
-   ϕemb = ∥ snd ∥ hh ∥ ∥
+ FirstHomCorollary|Set 𝑨 𝑩 h pe fe Bset buip = ∣ hh ∣ , ∥ snd ∥ hh ∥ ∥
+  where hh = FirstHomTheorem|Set 𝑨 𝑩 h pe fe Bset buip
 
 \end{code}
 
@@ -74,17 +64,13 @@ If we apply the foregoing theorem to the special case in which the `𝑨` is ter
 
 \begin{code}
 
- module _ {𝓤 𝓦 𝓧 : Level}(X : Set 𝓧)(𝑩 : Algebra 𝓦 𝑆)(h : hom (𝑻 X) 𝑩)
-         -- extensionality assumptions:
-          (pe : pred-ext (ov 𝓧) 𝓦)(fe : dfunext 𝓥 𝓦)
+ free-quot-subalg : (X : Set 𝓧)(𝑩 : Algebra 𝓦 𝑆)(h : hom (𝑻 X) 𝑩)
+     (pe : pred-ext (ov 𝓧) 𝓦)(fe : dfunext 𝓥 𝓦)                          -- extensionality assumptions
+     (Bset : is-set ∣ 𝑩 ∣)(buip : blk-uip (Term X) ∣ kercon 𝑩 {fe} h ∣)  -- truncation assumptions:
+     -------------------------------------------------------------------
+  →  ((𝑻 X) [ 𝑩 ]/ker h ↾ fe) IsSubalgebraOf 𝑩
 
-          -- truncation assumptions:
-          (Bset : is-set ∣ 𝑩 ∣)
-          (buip : blk-uip (Term X) ∣ kercon 𝑩 {fe} h ∣)
-          where
-
-  free-quot-subalg : ((𝑻 X) [ 𝑩 ]/ker h ↾ fe) IsSubalgebraOf 𝑩
-  free-quot-subalg = FirstHomCorollary|Set{𝓤 = ov 𝓧}(𝑻 X) 𝑩 h pe fe Bset buip
+ free-quot-subalg {𝓧 = 𝓧} X 𝑩 h pe fe Bset buip = FirstHomCorollary|Set{𝓤 = ov 𝓧}(𝑻 X) 𝑩 h pe fe Bset buip
 
 \end{code}
 
@@ -107,11 +93,10 @@ One of our goals is to formally express and prove properties of classes of algeb
 Suppose `𝒦 : Pred (Algebra 𝓤 𝑆) 𝓩` denotes a class of `𝑆`-algebras and `𝑩 : Algebra 𝓦 𝑆` denotes an arbitrary `𝑆`-algebra. Then we might wish to consider the assertion that `𝑩` is a subalgebra of an algebra in the class `𝒦`.  The next type we define allows us to express this assertion as `𝑩 IsSubalgebraOfClass 𝒦`.
 
 \begin{code}
-
- module _ {𝓦 𝓤 𝓩 : Level} where
+ module _ {𝓦 : Level} where
 
   _IsSubalgebraOfClass_ : Algebra 𝓦 𝑆 → Pred (Algebra 𝓤 𝑆) 𝓩 → Set(ov (𝓤 ⊔ 𝓦) ⊔ 𝓩)
-  𝑩 IsSubalgebraOfClass 𝒦 = Σ 𝑨 ꞉ Algebra 𝓤 𝑆 , Σ sa ꞉ Subalgebra{𝓦} 𝑨 , (𝑨 ∈ 𝒦) × (𝑩 ≅ ∣ sa ∣)
+  𝑩 IsSubalgebraOfClass 𝒦 = Σ 𝑨 ꞉ Algebra _ 𝑆 , Σ sa ꞉ Subalgebra{𝓦 = 𝓦} 𝑨 , (𝑨 ∈ 𝒦) × (𝑩 ≅ ∣ sa ∣)
 
 \end{code}
 
@@ -119,8 +104,8 @@ Using this type, we express the collection of all subalgebras of algebras in a c
 
 \begin{code}
 
- SubalgebraOfClass : {𝓦 𝓤 : Level} → Pred (Algebra 𝓤 𝑆)(ov 𝓤) → Set(ov (𝓤 ⊔ 𝓦))
- SubalgebraOfClass {𝓦} 𝒦 = Σ 𝑩 ꞉ Algebra 𝓦 𝑆 , 𝑩 IsSubalgebraOfClass 𝒦
+ SubalgebraOfClass : Pred (Algebra 𝓤 𝑆)(ov 𝓤) → Set(ov (𝓤 ⊔ 𝓦))
+ SubalgebraOfClass {𝓤}{𝓦} 𝒦 = Σ 𝑩 ꞉ Algebra 𝓦 𝑆 , 𝑩 IsSubalgebraOfClass 𝒦
 
 \end{code}
 
@@ -198,11 +183,10 @@ Next we prove that if two algebras are isomorphic and one of them is a subalgebr
 
 \begin{code}
 
- module _ {𝒦 : Pred (Algebra 𝓤 𝑆)(ov 𝓤)}{𝑩 : Algebra 𝓤 𝑆} where
+ Lift-is-sub : {𝒦 : Pred (Algebra 𝓤 𝑆)(ov 𝓤)}{𝑩 : Algebra 𝓤 𝑆}
+  →            𝑩 IsSubalgebraOfClass 𝒦 → (Lift-alg 𝑩 𝓤) IsSubalgebraOfClass 𝒦
 
-  Lift-is-sub : 𝑩 IsSubalgebraOfClass 𝒦 → (Lift-alg 𝑩 𝓤) IsSubalgebraOfClass 𝒦
-  Lift-is-sub (𝑨 , (sa , (KA , B≅sa))) = 𝑨 , sa , KA , ≅-trans (≅-sym Lift-≅) B≅sa
-
+ Lift-is-sub (𝑨 , (sa , (KA , B≅sa))) = 𝑨 , sa , KA , ≅-trans (≅-sym Lift-≅) B≅sa
 
  Lift-≤ : (𝑨 : Algebra 𝓧 𝑆){𝑩 : Algebra 𝓨 𝑆}{𝓩 : Level} → 𝑩 ≤ 𝑨 → Lift-alg 𝑩 𝓩 ≤ 𝑨
  Lift-≤ 𝑨 B≤A = ≤-iso 𝑨 (≅-sym Lift-≅) B≤A

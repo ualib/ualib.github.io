@@ -47,19 +47,19 @@ First we prove that the closure operator H is compatible with identities that ho
    β : 𝑨 ⊧ p ≈ q
    β = (H-id1 p q α) HA
 
-   preim : ∀ 𝒃 x → ∣ 𝑨 ∣
-   preim 𝒃 x = Inv ϕ (ϕsur (𝒃 x))
+   preim : (b : X → ∣ 𝑩 ∣ )(x : X) → ∣ 𝑨 ∣
+   preim b x = Inv ϕ (ϕsur (b x))
 
-   ζ : ∀ 𝒃 → ϕ ∘ (preim 𝒃) ≡ 𝒃
-   ζ 𝒃 = (fe 𝓧 𝓤) λ x → InvIsInv ϕ (ϕsur (𝒃 x))
+   ζ : (b : X → ∣ 𝑩 ∣ ) → ϕ ∘ (preim b) ≡ b
+   ζ b = (fe 𝓧 𝓤) λ x → InvIsInv ϕ (ϕsur (b x))
 
-   γ : 𝑩 ⟦ p ⟧  ≡ 𝑩 ⟦ q ⟧
-   γ = (fe 𝓾𝔁 𝓤) λ 𝒃 → (𝑩 ⟦ p ⟧) 𝒃             ≡⟨ (ap (𝑩 ⟦ p ⟧) (ζ 𝒃))⁻¹ ⟩
-                 (𝑩 ⟦ p ⟧)(ϕ ∘(preim 𝒃)) ≡⟨(comm-hom-term (fe 𝓥 𝓤) 𝑩(ϕ , ϕhom) p(preim 𝒃))⁻¹ ⟩
-                 ϕ((𝑨 ⟦ p ⟧)(preim 𝒃))   ≡⟨ ap ϕ (happly β (preim 𝒃)) ⟩
-                 ϕ((𝑨 ⟦ q ⟧)(preim 𝒃))   ≡⟨ comm-hom-term (fe 𝓥 𝓤) 𝑩 (ϕ , ϕhom) q (preim 𝒃) ⟩
-                 (𝑩 ⟦ q ⟧)(ϕ ∘(preim 𝒃)) ≡⟨ ap (𝑩 ⟦ q ⟧) (ζ 𝒃) ⟩
-                 (𝑩 ⟦ q ⟧) 𝒃             ∎
+   γ : 𝑩 ⊧ p ≈ q
+   γ b = 𝑩 ⟦ p ⟧ b              ≡⟨(ap (λ x → 𝑩 ⟦ p ⟧ x) (ζ b))⁻¹ ⟩
+         𝑩 ⟦ p ⟧ (ϕ ∘(preim b)) ≡⟨(comm-hom-term (fe 𝓥 𝓤) 𝑩(ϕ , ϕhom) p(preim b))⁻¹ ⟩
+         ϕ (𝑨 ⟦ p ⟧ (preim b))  ≡⟨ ap ϕ (β (preim b)) ⟩
+         ϕ (𝑨 ⟦ q ⟧(preim b))   ≡⟨ comm-hom-term (fe 𝓥 𝓤) 𝑩 (ϕ , ϕhom) q (preim b) ⟩
+         𝑩 ⟦ q ⟧ (ϕ ∘(preim b)) ≡⟨ ap (λ x → 𝑩 ⟦ q ⟧ x) (ζ b) ⟩
+         𝑩 ⟦ q ⟧ b              ∎
 
   H-id1 p q α (hiso{𝑨}{𝑩} x x₁) = ⊧-I-invar fe 𝑩 p q (H-id1 p q α x) x₁
 
@@ -86,7 +86,7 @@ First we prove that the closure operator H is compatible with identities that ho
   S-id1 p q α (slift x) = ⊧-Lift-invar fe p q ((S-id1 p q α) x)
 
   S-id1 p q α (ssub{𝑨}{𝑩} sA B≤A) =
-   ⊧-S-class-invar fe p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
+   ⊧-S-class-invar (fe 𝓥 𝓤) p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
     where --Apply S-⊧ to the class 𝒦 ∪ ｛ 𝑨 ｝
     β : 𝑨 ⊧ p ≈ q
     β = S-id1 p q α sA
@@ -99,7 +99,7 @@ First we prove that the closure operator H is compatible with identities that ho
     γ {𝑩} (inj₂ y) = Apq y
 
   S-id1 p q α (ssubw{𝑨}{𝑩} sA B≤A) =
-   ⊧-S-class-invar fe p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
+   ⊧-S-class-invar (fe 𝓥 𝓤)  p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
     where  --Apply S-⊧ to the class 𝒦 ∪ ｛ 𝑨 ｝
     β : 𝑨 ⊧ p ≈ q
     β = S-id1 p q α sA
@@ -138,12 +138,12 @@ First we prove that the closure operator H is compatible with identities that ho
 
   P-id1 p q α (produ{I}{𝒜} x) = ⊧-P-lift-invar I 𝒜  fe {p}{q} IH
    where
-   IH : ∀ i → (Lift-alg (𝒜 i) 𝓤) ⟦ p ⟧ ≡ (Lift-alg (𝒜 i) 𝓤) ⟦ q ⟧
+   IH : ∀ i a → ((Lift-alg (𝒜 i) 𝓤) ⟦ p ⟧ a) ≡ ((Lift-alg (𝒜 i) 𝓤) ⟦ q ⟧ a)
    IH i = ⊧-Lift-invar fe p q ((P-id1 p q α) (x i))
 
   P-id1 p q α (prodw{I}{𝒜} x) = ⊧-P-lift-invar I 𝒜 fe {p}{q}IH
    where
-   IH : ∀ i → Lift-alg (𝒜 i) 𝓤 ⟦ p ⟧ ≡ Lift-alg (𝒜 i) 𝓤 ⟦ q ⟧
+   IH : ∀ i a → (Lift-alg (𝒜 i) 𝓤 ⟦ p ⟧ a) ≡ (Lift-alg (𝒜 i) 𝓤 ⟦ q ⟧ a)
    IH i = ⊧-Lift-invar fe p q ((P-id1 p q α) (x i))
 
   P-id1 p q α (pisou{𝑨}{𝑩} x x₁) = ⊧-I-invar fe 𝑩 p q (P-id1 p q α x) x₁
@@ -183,15 +183,15 @@ First we prove that the closure operator H is compatible with identities that ho
    ζ : ∀ 𝒃 → ϕ ∘ (preim 𝒃) ≡ 𝒃
    ζ 𝒃 = (fe 𝓧 𝓤) λ x → InvIsInv ϕ (ϕE (𝒃 x))
 
-   γ : (𝑩 ⟦ p ⟧) ≡ (𝑩 ⟦ q ⟧)
-   γ = (fe 𝓾𝔁 𝓤) λ 𝒃 → (𝑩 ⟦ p ⟧) 𝒃      ≡⟨ (ap (𝑩 ⟦ p ⟧) (ζ 𝒃))⁻¹ ⟩
-                 (𝑩 ⟦ p ⟧)(ϕ ∘(preim 𝒃)) ≡⟨(comm-hom-term (fe 𝓥 𝓤) 𝑩(ϕ , ϕh) p(preim 𝒃))⁻¹ ⟩
-                 ϕ ((𝑨 ⟦ p ⟧)(preim 𝒃))  ≡⟨ ap ϕ (happly IH (preim 𝒃)) ⟩
-                 ϕ ((𝑨 ⟦ q ⟧)(preim 𝒃))  ≡⟨ comm-hom-term (fe 𝓥 𝓤) 𝑩 (ϕ , ϕh) q (preim 𝒃) ⟩
-                 (𝑩 ⟦ q ⟧)(ϕ ∘(preim 𝒃)) ≡⟨ ap (𝑩 ⟦ q ⟧) (ζ 𝒃) ⟩
-                 (𝑩 ⟦ q ⟧) 𝒃             ∎
+   γ : (b : X → ∣ 𝑩 ∣) → 𝑩 ⟦ p ⟧ b ≡ 𝑩 ⟦ q ⟧ b
+   γ b = 𝑩 ⟦ p ⟧ b      ≡⟨ (ap (λ x → 𝑩 ⟦ p ⟧ x) (ζ b))⁻¹ ⟩
+         𝑩 ⟦ p ⟧ (ϕ ∘(preim b)) ≡⟨(comm-hom-term (fe 𝓥 𝓤) 𝑩(ϕ , ϕh) p(preim b))⁻¹ ⟩
+         ϕ (𝑨 ⟦ p ⟧ (preim b))  ≡⟨ ap ϕ (IH (preim b)) ⟩
+         ϕ (𝑨 ⟦ q ⟧ (preim b))  ≡⟨ comm-hom-term (fe 𝓥 𝓤) 𝑩 (ϕ , ϕh) q (preim b) ⟩
+         𝑩 ⟦ q ⟧ (ϕ ∘(preim b)) ≡⟨ ap (λ x → 𝑩 ⟦ q ⟧ x) (ζ b) ⟩
+         𝑩 ⟦ q ⟧ b             ∎
 
-  V-id1 p q α (vssub {𝑨}{𝑩} VA B≤A) = ⊧-S-class-invar fe p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
+  V-id1 p q α (vssub {𝑨}{𝑩} VA B≤A) = ⊧-S-class-invar (fe 𝓥 𝓤) p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
     where
     IH : 𝑨 ⊧ p ≈ q
     IH = V-id1 p q α VA
@@ -204,7 +204,7 @@ First we prove that the closure operator H is compatible with identities that ho
     γ {𝑩} (inj₂ y) = Asinglepq y
 
   V-id1 p q α ( vssubw {𝑨}{𝑩} VA B≤A ) =
-   ⊧-S-class-invar fe p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
+   ⊧-S-class-invar (fe 𝓥 𝓤) p q γ (𝑩 , 𝑨 , (𝑩 , B≤A) , inj₂ refl , ≅-refl)
     where
     IH : 𝑨 ⊧ p ≈ q
     IH = V-id1 p q α VA
@@ -226,8 +226,7 @@ First we prove that the closure operator H is compatible with identities that ho
   V-id1' p q α (vbase x) = ⊧-Lift-invar fe p q (α x)
   V-id1' p q α (vlift{𝑨} x) = ⊧-Lift-invar fe p q ((V-id1 p q α) x)
   V-id1' p q α (vliftw{𝑨} x) = ⊧-Lift-invar fe p q ((V-id1' p q α) x)
-  V-id1' p q α (vhimg{𝑨}{𝑪} VA ((𝑩 , ϕ , (ϕh , ϕE)) , B≅C)) =
-   ⊧-I-invar fe 𝑪 p q γ B≅C
+  V-id1' p q α (vhimg{𝑨}{𝑪} VA ((𝑩 , ϕ , (ϕh , ϕE)) , B≅C)) = ⊧-I-invar fe 𝑪 p q γ B≅C
     where
     IH : 𝑨 ⊧ p ≈ q
     IH = V-id1' p q α VA
@@ -238,16 +237,16 @@ First we prove that the closure operator H is compatible with identities that ho
     ζ : ∀ 𝒃 → ϕ ∘ (preim 𝒃) ≡ 𝒃
     ζ 𝒃 = (fe 𝓧 𝓕⁺) λ x → InvIsInv ϕ (ϕE (𝒃 x))
 
-    γ : 𝑩 ⟦ p ⟧ ≡ 𝑩 ⟦ q ⟧
-    γ = (fe (𝓧 ⊔ 𝓕⁺) 𝓕⁺) λ 𝒃 → (𝑩 ⟦ p ⟧) 𝒃  ≡⟨ (ap (𝑩 ⟦ p ⟧) (ζ 𝒃))⁻¹  ⟩
-                  (𝑩 ⟦ p ⟧) (ϕ ∘ (preim 𝒃)) ≡⟨(comm-hom-term (fe 𝓥 𝓕⁺) 𝑩 (ϕ , ϕh) p (preim 𝒃))⁻¹ ⟩
-                  ϕ((𝑨 ⟦ p ⟧)(preim 𝒃))     ≡⟨ ap ϕ (happly IH (preim 𝒃))⟩
-                  ϕ((𝑨 ⟦ q ⟧)(preim 𝒃))     ≡⟨ comm-hom-term (fe 𝓥 𝓕⁺) 𝑩 (ϕ , ϕh) q (preim 𝒃)⟩
-                  (𝑩 ⟦ q ⟧)(ϕ ∘ (preim 𝒃))  ≡⟨ ap (𝑩 ⟦ q ⟧) (ζ 𝒃)⟩
-                  (𝑩 ⟦ q ⟧) 𝒃               ∎
+    γ : (b : X → ∣ 𝑩 ∣ ) → 𝑩 ⟦ p ⟧ b ≡ 𝑩 ⟦ q ⟧ b
+    γ b = 𝑩 ⟦ p ⟧ b  ≡⟨ (ap (λ x → 𝑩 ⟦ p ⟧ x) (ζ b))⁻¹  ⟩
+          𝑩 ⟦ p ⟧ (ϕ ∘ (preim b)) ≡⟨(comm-hom-term (fe 𝓥 𝓕⁺) 𝑩 (ϕ , ϕh) p (preim b))⁻¹ ⟩
+          ϕ (𝑨 ⟦ p ⟧ (preim b))     ≡⟨ ap ϕ (IH (preim b))⟩
+          ϕ (𝑨 ⟦ q ⟧ (preim b))     ≡⟨ comm-hom-term (fe 𝓥 𝓕⁺) 𝑩 (ϕ , ϕh) q (preim b)⟩
+          𝑩 ⟦ q ⟧ (ϕ ∘ (preim b))  ≡⟨ ap (λ x → 𝑩 ⟦ q ⟧ x) (ζ b)⟩
+          𝑩 ⟦ q ⟧ b               ∎
 
-  V-id1' p q α (vssub{𝑨}{𝑩} VA B≤A) = ⊧-S-invar fe 𝑩 {p}{q}(V-id1 p q α VA) B≤A
-  V-id1' p q α (vssubw {𝑨}{𝑩} VA B≤A) = ⊧-S-invar fe 𝑩 {p}{q}(V-id1' p q α VA) B≤A
+  V-id1' p q α (vssub{𝑨}{𝑩} VA B≤A) = ⊧-S-invar (fe 𝓥 𝓤) 𝑩 {p}{q}(V-id1 p q α VA) B≤A
+  V-id1' p q α (vssubw {𝑨}{𝑩} VA B≤A) = ⊧-S-invar (fe 𝓥 (lsuc 𝓞 ⊔ lsuc 𝓥 ⊔ lsuc (lsuc 𝓤))) 𝑩 {p}{q}(V-id1' p q α VA) B≤A
   V-id1' p q α (vprodu{I}{𝒜} V𝒜) = ⊧-P-invar I 𝒜 fe {p}{q} λ i → V-id1 p q α (V𝒜 i)
   V-id1' p q α (vprodw{I}{𝒜} V𝒜) = ⊧-P-invar I 𝒜 fe {p}{q} λ i → V-id1' p q α (V𝒜 i) -- {fwu = (fe 𝓕⁺ 𝓕⁺)}{(fe 𝓥 𝓕⁺)}{(fe 𝓕⁺ 𝓕⁺)}
   V-id1' p q α (visou {𝑨}{𝑩} VA A≅B) = ⊧-I-invar fe 𝑩 p q (V-id1 p q α VA) A≅B
@@ -283,10 +282,8 @@ First we prove that the closure operator H is compatible with identities that ho
 
  \begin{code}
 
- module _ {𝓦 : Level}{𝒦 : Pred (Algebra 𝓤 𝑆)(ov 𝓤)} where
-
-  V-id2 : DFunExt → (p q : Term X) → (V{𝓤}{𝓦} 𝒦 ⊧ p ≋ q) → (𝒦 ⊧ p ≋ q)
-  V-id2 fe p q Vpq {𝑨} KA = ⊧-lower-invar fe p q (Vpq (vbase KA))
+  V-id2 : (p q : Term X) → (V{𝓤}{𝓦} 𝒦 ⊧ p ≋ q) → (𝒦 ⊧ p ≋ q)
+  V-id2 p q Vpq {𝑨} KA = ⊧-lower-invar fe p q (Vpq (vbase KA))
 
  \end{code}
 

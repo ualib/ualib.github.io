@@ -140,7 +140,7 @@ cong-app refl _ = refl
 
 \end{code}
 
-
+In the next section we will introduce the shorthand `f ∼ g` for the point-wise equivalence of functions, `∀ x → f x ≡ g x`.
 
 
 

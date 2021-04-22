@@ -42,7 +42,7 @@ The definition of `Term X` is recursive, indicating that an inductive type could
 
 \begin{code}
 
- data Term {𝓧 : Level}(X : Set 𝓧 ) : Set(ov 𝓧)  where
+ data Term (X : Set 𝓧 ) : Set(ov 𝓧)  where
   ℊ : X → Term X    -- (ℊ for "generator")
   node : (f : ∣ 𝑆 ∣)(𝑡 : ∥ 𝑆 ∥ f → Term X) → Term X
 
@@ -69,7 +69,7 @@ In [Agda][] the term algebra can be defined as simply as one could hope.
 
 \begin{code}
 
- 𝑻 : {𝓧 : Level}(X : Set 𝓧 ) → Algebra (ov 𝓧) 𝑆
+ 𝑻 : (X : Set 𝓧 ) → Algebra (ov 𝓧) 𝑆
  𝑻 X = Term X , node
 
 \end{code}
@@ -87,11 +87,9 @@ We now prove this in [Agda][], starting with the fact that every map from `X` to
 
 \begin{code}
 
- module _ {𝓤 𝓧 : Level}{X : Set 𝓧 } where
-
-  free-lift : (𝑨 : Algebra 𝓤 𝑆)(h : X → ∣ 𝑨 ∣) → ∣ 𝑻 X ∣ → ∣ 𝑨 ∣
-  free-lift _ h (ℊ x) = h x
-  free-lift 𝑨 h (node f 𝑡) = (f ̂ 𝑨) (λ i → free-lift 𝑨 h (𝑡 i))
+ free-lift : {X : Set 𝓧 }(𝑨 : Algebra 𝓤 𝑆)(h : X → ∣ 𝑨 ∣) → ∣ 𝑻 X ∣ → ∣ 𝑨 ∣
+ free-lift _ h (ℊ x) = h x
+ free-lift 𝑨 h (node f 𝑡) = (f ̂ 𝑨) (λ i → free-lift 𝑨 h (𝑡 i))
 
 \end{code}
 
@@ -106,9 +104,8 @@ The free lift so defined is a homomorphism by construction. Indeed, here is the 
 
 \begin{code}
 
-  lift-hom : (𝑨 : Algebra 𝓤 𝑆) → (X → ∣ 𝑨 ∣) → hom (𝑻 X) 𝑨
-
-  lift-hom 𝑨 h = free-lift 𝑨 h , λ f a → ap (f ̂ 𝑨) refl
+ lift-hom : {X : Set 𝓧 }(𝑨 : Algebra 𝓤 𝑆) → (X → ∣ 𝑨 ∣) → hom (𝑻 X) 𝑨
+ lift-hom 𝑨 h = free-lift 𝑨 h , λ f a → ap (f ̂ 𝑨) refl
 
 \end{code}
 
@@ -116,18 +113,16 @@ Finally, we prove that the homomorphism is unique.  This requires `funext 𝓥 �
 
 \begin{code}
 
-  free-unique : funext 𝓥 𝓤 → (𝑨 : Algebra 𝓤 𝑆)(g h : hom (𝑻 X) 𝑨)
-   →            (∀ x → ∣ g ∣ (ℊ x) ≡ ∣ h ∣ (ℊ x))
-                ----------------------------------------------------
-   →            ∀ (t : Term X) →  ∣ g ∣ t ≡ ∣ h ∣ t
+ free-unique : funext 𝓥 𝓤 → {X : Set 𝓧 }(𝑨 : Algebra 𝓤 𝑆)(g h : hom (𝑻 X) 𝑨)
+  →            (∀ x → ∣ g ∣ (ℊ x) ≡ ∣ h ∣ (ℊ x)) → (t : Term X) → ∣ g ∣ t ≡ ∣ h ∣ t
 
-  free-unique _ _ _ _ p (ℊ x) = p x
+ free-unique _ _ _ _ p (ℊ x) = p x
 
-  free-unique fe 𝑨 g h p (node 𝑓 𝑡) = ∣ g ∣ (node 𝑓 𝑡)  ≡⟨ ∥ g ∥ 𝑓 𝑡 ⟩
+ free-unique fe 𝑨 g h p (node 𝑓 𝑡) = ∣ g ∣ (node 𝑓 𝑡)  ≡⟨ ∥ g ∥ 𝑓 𝑡 ⟩
                                      (𝑓 ̂ 𝑨)(∣ g ∣ ∘ 𝑡)  ≡⟨ α ⟩
                                      (𝑓 ̂ 𝑨)(∣ h ∣ ∘ 𝑡)  ≡⟨ (∥ h ∥ 𝑓 𝑡)⁻¹ ⟩
                                      ∣ h ∣ (node 𝑓 𝑡)   ∎
-   where
+  where
    α : (𝑓 ̂ 𝑨) (∣ g ∣ ∘ 𝑡) ≡ (𝑓 ̂ 𝑨) (∣ h ∣ ∘ 𝑡)
    α = ap (𝑓 ̂ 𝑨) (fe λ i → free-unique fe 𝑨 g h p (𝑡 i))
 
@@ -139,12 +134,9 @@ If we further assume that each of the mappings from `X` to `∣ 𝑨 ∣` is *su
 
 \begin{code}
 
-  lift-of-epi-is-epi : {𝑨 : Algebra 𝓤 𝑆}{h₀ : X → ∣ 𝑨 ∣}
-                       ---------------------------------
-   →                   Epic h₀ → Epic ∣ lift-hom 𝑨 h₀ ∣
-
-  lift-of-epi-is-epi {𝑨}{h₀} hE y = γ
-   where
+ lift-of-epi-is-epi : {X : Set 𝓧}{𝑨 : Algebra 𝓤 𝑆}{h₀ : X → ∣ 𝑨 ∣} → Epic h₀ → Epic ∣ lift-hom 𝑨 h₀ ∣
+ lift-of-epi-is-epi {𝑨 = 𝑨}{h₀} hE y = γ
+  where
    h₀⁻¹y = Inv h₀ (hE y)
 
    η : y ≡ ∣ lift-hom 𝑨 h₀ ∣ (ℊ h₀⁻¹y)

@@ -47,22 +47,20 @@ Without further ado, we present our formalization of the first homomorphism theo
 \begin{code}
 
 
- module _ {𝓤 𝓦 : Level} where
+ FirstHomTheorem|Set : (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩)
+                       -- extensionality assumptions:
+  →                    pred-ext 𝓤 𝓦
+  →                    (fe : dfunext 𝓥 𝓦)
 
-  FirstHomTheorem|Set : (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩)
-                        -- extensionality assumptions:
-   →                       pred-ext 𝓤 𝓦
-   →                       (fe : dfunext 𝓥 𝓦)
+                       -- truncation assumptions:
+  →                    is-set ∣ 𝑩 ∣
+  →                    blk-uip ∣ 𝑨 ∣ ∣ kercon 𝑩 {fe} h ∣
 
-                        -- truncation assumptions:
-   →                       is-set ∣ 𝑩 ∣
-   →                       blk-uip ∣ 𝑨 ∣ ∣ kercon 𝑩 {fe} h ∣
+  → Σ φ ꞉ (hom (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩) , (∣ h ∣ ≡ ∣ φ ∣ ∘ ∣ πker 𝑩 {fe} h ∣) × Monic ∣ φ ∣ × is-embedding ∣ φ ∣
 
-   → Σ φ ꞉ (hom (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩) , (∣ h ∣ ≡ ∣ φ ∣ ∘ ∣ πker 𝑩 {fe} h ∣) × Monic ∣ φ ∣ × is-embedding ∣ φ ∣
-
-  FirstHomTheorem|Set 𝑨 𝑩 h pe fe Bset buip = (φ , φhom) , φcom , φmon , φemb
-   where
-   θ : Con{𝓦} 𝑨
+ FirstHomTheorem|Set {𝓤}{𝓦} 𝑨 𝑩 h pe fe Bset buip = (φ , φhom) , φcom , φmon , φemb
+  where
+   θ : Con{𝓤}{𝓦} 𝑨
    θ = kercon 𝑩 {fe} h
    ξ : IsEquivalence ∣ θ ∣
    ξ = IsCongruence.is-equivalence ∥ θ ∥
@@ -90,21 +88,19 @@ Below we will prove that the homomorphism `φ`, whose existence we just proved, 
 
 \begin{code}
 
-  FirstIsoTheorem|Set : (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩)
-                        -- extensionality assumptions:
-   →                       pred-ext 𝓤 𝓦
-   →                       (fe : dfunext 𝓥 𝓦)
-   →                       dfunext 𝓦 𝓦
+ FirstIsoTheorem|Set : (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩)
+                       -- extensionality assumptions:
+  →                    pred-ext 𝓤 𝓦
+  →                    (fe : dfunext 𝓥 𝓦)
+  →                    dfunext 𝓦 𝓦
+                       -- truncation assumptions:
+  →                    is-set ∣ 𝑩 ∣
+  →                    blk-uip ∣ 𝑨 ∣ ∣ kercon 𝑩{fe}h ∣
+  → Epic ∣ h ∣
+  → Σ f ꞉ epi (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩 , (∣ h ∣ ≡ ∣ f ∣ ∘ ∣ πker 𝑩{fe}h ∣) × Monic ∣ f ∣ × is-embedding ∣ f ∣
 
-                        -- truncation assumptions:
-   →                       is-set ∣ 𝑩 ∣
-   →                       blk-uip ∣ 𝑨 ∣ ∣ kercon 𝑩{fe}h ∣
-
-   → Epic ∣ h ∣
-   → Σ f ꞉ epi (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩 , (∣ h ∣ ≡ ∣ f ∣ ∘ ∣ πker 𝑩{fe}h ∣) × Monic ∣ f ∣ × is-embedding ∣ f ∣
-
-  FirstIsoTheorem|Set 𝑨 𝑩 h pe fe feww Bset buip hE = (fmap , fhom , fepic) , refl , (snd ∥ FHT ∥)
-   where
+ FirstIsoTheorem|Set 𝑨 𝑩 h pe fe feww Bset buip hE = (fmap , fhom , fepic) , refl , (snd ∥ FHT ∥)
+  where
    FHT = FirstHomTheorem|Set 𝑨 𝑩 h pe fe Bset buip  -- (φ , φhom) , φcom , φmon , φemb
 
    fmap : ∣ 𝑨 [ 𝑩 ]/ker h ↾ fe ∣ → ∣ 𝑩 ∣
@@ -130,7 +126,7 @@ Now we prove that the homomorphism `φ`, whose existence is guaranteed by `First
 
 \begin{code}
 
- module _ {𝓤 𝓦 : Level}{fe : dfunext 𝓥 𝓦}(𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩) where
+ module _ {fe : dfunext 𝓥 𝓦}(𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆)(h : hom 𝑨 𝑩) where
 
   NoetherHomUnique : (f g : hom (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩)
    →                 ∣ h ∣ ≡ ∣ f ∣ ∘ ∣ πker 𝑩 {fe} h ∣ → ∣ h ∣ ≡ ∣ g ∣ ∘ ∣ πker 𝑩{fe} h ∣
@@ -139,17 +135,6 @@ Now we prove that the homomorphism `φ`, whose existence is guaranteed by `First
   NoetherHomUnique f g hfk hgk (_ , (a , refl)) = ∣ f ∣ (_ , (a , refl)) ≡⟨ cong-app(hfk ⁻¹)a ⟩
                                                   ∣ h ∣ a                ≡⟨ cong-app(hgk)a ⟩
                                                   ∣ g ∣ (_ , (a , refl)) ∎
-
-\end{code}
-
-If, in addition, we postulate extensionality of functions defined on the domain `𝑨 [ 𝑩 ]/ker h`, then we obtain the following variation of the last result.<sup>[1](Homomorphisms.Noether.html#fn1)</sup>
-
-\begin{code}
-
-  fe-NoetherHomUnique : {fuww : funext (𝓤 ⊔ lsuc 𝓦) 𝓦}(f g : hom (𝑨 [ 𝑩 ]/ker h ↾ fe) 𝑩)
-   →  ∣ h ∣ ≡ ∣ f ∣ ∘ ∣ πker 𝑩{fe} h ∣  →  ∣ h ∣ ≡ ∣ g ∣ ∘ ∣ πker 𝑩{fe} h ∣  →  ∣ f ∣ ≡ ∣ g ∣
-
-  fe-NoetherHomUnique {fuww} f g hfk hgk = fuww (NoetherHomUnique f g hfk hgk)
 
 \end{code}
 
@@ -175,7 +160,7 @@ The composition of homomorphisms is again a homomorphism.  We formalize this in 
 
 \begin{code}
 
- module _ {𝓧 𝓨 𝓩 : Level} (𝑨 : Algebra 𝓧 𝑆){𝑩 : Algebra 𝓨 𝑆}(𝑪 : Algebra 𝓩 𝑆) where
+ module _ (𝑨 : Algebra 𝓧 𝑆){𝑩 : Algebra 𝓨 𝑆}(𝑪 : Algebra 𝓩 𝑆) where
 
   ∘-hom : hom 𝑨 𝑩  →  hom 𝑩 𝑪  →  hom 𝑨 𝑪
   ∘-hom (g , ghom) (h , hhom) = h ∘ g , γ where
@@ -199,79 +184,20 @@ The composition of homomorphisms is again a homomorphism.  We formalize this in 
 
 #### <a id="homomorphism-decomposition">Homomorphism decomposition</a>
 
-If `g : hom 𝑨 𝑩`, `h : hom 𝑨 𝑪`, `h` is surjective, and `ker h ⊆ ker g`, then there exists `φ : hom 𝑪 𝑩` such that `g = φ ∘ h`, that is, such that the following diagram commutes;
+If `α : hom 𝑨 𝑩`, `β : hom 𝑨 𝑪`, `β` is surjective, and `ker β ⊆ ker α`, then there exists `φ : hom 𝑪 𝑩` such that `α = φ ∘ β`; that is, such that the following diagram commutes.
 
 ```
-𝑨---- h -->>𝑪
+𝑨---- β -->>𝑪
  \         .
   \       .
-   g     ∃φ
+   α     ∃φ
     \   .
      \ .
       V
       𝑩
 ```
 
-This, or some variation of it, is sometimes referred to as the Second Isomorphism Theorem.  We formalize its statement and proof as follows. (Notice that the proof is constructive.)
-
-\begin{code}
- module _ {𝓤 : Level}{𝑨 𝑩 𝑪 : Algebra 𝓤 𝑆} where
-  homFactor : funext 𝓤 𝓤 → (g : hom 𝑨 𝑩)(h : hom 𝑨 𝑪)
-   →          kernel ∣ h ∣ ⊆ kernel ∣ g ∣ → Epic ∣ h ∣
-              -------------------------------------------
-   →          Σ φ ꞉ (hom 𝑪 𝑩) , ∣ g ∣ ≡ ∣ φ ∣ ∘ ∣ h ∣
-
-  homFactor fe(g , ghom)(h , hhom) Kh⊆Kg hEpi = (φ , φIsHomCB) , gφh
-   where
-   hInv : ∣ 𝑪 ∣ → ∣ 𝑨 ∣
-   hInv = λ c → (EpicInv h hEpi) c
-
-   φ : ∣ 𝑪 ∣ → ∣ 𝑩 ∣
-   φ = λ c → g ( hInv c )
-
-   ξ : ∀ x → kernel h (x , hInv (h x))
-   ξ x = (cong-app (EpicInvIsRightInv {fe = fe} h hEpi) (h x))⁻¹
-
-   gφh : g ≡ φ ∘ h
-   gφh = fe  λ x → Kh⊆Kg (ξ x)
-
-   ζ : (𝑓 : ∣ 𝑆 ∣)(𝒄 : ∥ 𝑆 ∥ 𝑓 → ∣ 𝑪 ∣)(x : ∥ 𝑆 ∥ 𝑓) →  𝒄 x ≡ (h ∘ hInv)(𝒄 x)
-   ζ  𝑓 𝒄 x = (cong-app (EpicInvIsRightInv {fe = fe} h hEpi) (𝒄 x))⁻¹
-
-   ι : (𝑓 : ∣ 𝑆 ∣)(𝒄 : ∥ 𝑆 ∥ 𝑓 → ∣ 𝑪 ∣) →  𝒄 ≡ h ∘ (hInv ∘ 𝒄)
-   ι 𝑓 𝒄 = ap (λ - → - ∘ 𝒄)(EpicInvIsRightInv {fe = fe} h hEpi)⁻¹
-
-   useker : ∀ 𝑓 𝒄 → g(hInv (h((𝑓 ̂ 𝑨)(hInv ∘ 𝒄)))) ≡ g((𝑓 ̂ 𝑨)(hInv ∘ 𝒄))
-   useker 𝑓 c = Kh⊆Kg (cong-app (EpicInvIsRightInv{fe = fe} h hEpi)
-                                (h ((𝑓 ̂ 𝑨)(hInv ∘ c))) )
-
-   φIsHomCB : (𝑓 : ∣ 𝑆 ∣)(𝒄 : ∥ 𝑆 ∥ 𝑓 → ∣ 𝑪 ∣) → φ((𝑓 ̂ 𝑪) 𝒄) ≡ (𝑓 ̂ 𝑩)(φ ∘ 𝒄)
-
-   φIsHomCB 𝑓 𝒄 =  g (hInv ((𝑓 ̂ 𝑪) 𝒄))              ≡⟨ i   ⟩
-                  g (hInv ((𝑓 ̂ 𝑪)(h ∘ (hInv ∘ 𝒄)))) ≡⟨ ii  ⟩
-                  g (hInv (h ((𝑓 ̂ 𝑨)(hInv ∘ 𝒄))))   ≡⟨ iii ⟩
-                  g ((𝑓 ̂ 𝑨)(hInv ∘ 𝒄))              ≡⟨ iv  ⟩
-                  (𝑓 ̂ 𝑩)(λ x → g (hInv (𝒄 x)))      ∎
-    where
-    i   = ap (g ∘ hInv) (ap (𝑓 ̂ 𝑪) (ι 𝑓 𝒄))
-    ii  = ap (g ∘ hInv) (hhom 𝑓 (hInv ∘ 𝒄))⁻¹
-    iii = useker 𝑓 𝒄
-    iv  = ghom 𝑓 (hInv ∘ 𝒄)
-
-\end{code}
-
-Here's a more general version.
-
-```
-𝑨 --- γ ->> 𝑪
- \         .
-  \       .
-   β     ∃φ
-    \   .
-     \ .
-      V
-      𝑩
-```
+We formalize its statement and proof (constructively) as follows.
 
 \begin{code}
 
@@ -318,6 +244,8 @@ Here's a more general version.
 
 \end{code}
 
+In defining φ some choice is involved, so it may come as a surprise that we can prove this result constructively.  The reason this is possible is that our formalization of surjectivity (i.e., the type `Epic`) has computational content; it not only says that each point `b` of the codomain is the image of a point in the domain, but also provides a witness `a` that is in the preimage of `b`.
+
 If, in addition to the hypotheses of the last theorem, we assume α is epic, then so is φ. (Note that the proof also requires an additional local function extensionality postulate, `funext 𝓨 𝓨`.)
 
 \begin{code}
@@ -361,3 +289,5 @@ If, in addition to the hypotheses of the last theorem, we assume α is epic, the
 <span style="float:right;">[Homomorphisms.Isomorphisms →](Homomorphisms.Isomorphisms.html)</span>
 
 {% include UALib.Links.md %}
+
+

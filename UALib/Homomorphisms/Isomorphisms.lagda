@@ -31,7 +31,7 @@ Recall, `f ~ g` means f and g are *extensionally* (or pointwise) equal; i.e., `�
 
 \begin{code}
 
- _≅_ : {𝓤 𝓦 : Level}(𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆) → Set(𝓞 ⊔ 𝓥 ⊔ 𝓤 ⊔ 𝓦)
+ _≅_ : (𝑨 : Algebra 𝓤 𝑆)(𝑩 : Algebra 𝓦 𝑆) → Set(𝓞 ⊔ 𝓥 ⊔ 𝓤 ⊔ 𝓦)
  𝑨 ≅ 𝑩 =  Σ f ꞉ (hom 𝑨 𝑩) , Σ g ꞉ (hom 𝑩 𝑨) , (∣ f ∣ ∘ ∣ g ∣ ∼ ∣ 𝒾𝒹 𝑩 ∣)
                                             × (∣ g ∣ ∘ ∣ f ∣ ∼ ∣ 𝒾𝒹 𝑨 ∣)
 
@@ -45,20 +45,15 @@ That is, two structures are **isomorphic** provided there are homomorphisms goin
 
 \begin{code}
 
- ≅-refl : {𝓤 : Level} {𝑨 : Algebra 𝓤 𝑆} → 𝑨 ≅ 𝑨
- ≅-refl {𝓤}{𝑨} = 𝒾𝒹 𝑨 , 𝒾𝒹 𝑨 , (λ a → refl) , (λ a → refl)
+ ≅-refl : {𝑨 : Algebra 𝓤 𝑆} → 𝑨 ≅ 𝑨
+ ≅-refl {𝑨 = 𝑨} = 𝒾𝒹 𝑨 , 𝒾𝒹 𝑨 , (λ a → refl) , (λ a → refl)
 
- ≅-sym : {𝓤 𝓦 : Level}{𝑨 : Algebra 𝓤 𝑆}{𝑩 : Algebra 𝓦 𝑆}
-  →      𝑨 ≅ 𝑩 → 𝑩 ≅ 𝑨
+ ≅-sym : {𝑨 : Algebra 𝓤 𝑆}{𝑩 : Algebra 𝓦 𝑆} → 𝑨 ≅ 𝑩 → 𝑩 ≅ 𝑨
  ≅-sym h = fst ∥ h ∥ , fst h , ∥ snd ∥ h ∥ ∥ , ∣ snd ∥ h ∥ ∣
 
- module _ {𝓧 𝓨 𝓩 : Level} where
-
-  ≅-trans : {𝑨 : Algebra 𝓧 𝑆}{𝑩 : Algebra 𝓨 𝑆}{𝑪 : Algebra 𝓩 𝑆}
-   →        𝑨 ≅ 𝑩 → 𝑩 ≅ 𝑪 → 𝑨 ≅ 𝑪
-
-  ≅-trans {𝑨} {𝑩}{𝑪} ab bc = f , g , α , β
-   where
+ ≅-trans : {𝑨 : Algebra 𝓧 𝑆}{𝑩 : Algebra 𝓨 𝑆}{𝑪 : Algebra 𝓩 𝑆} → 𝑨 ≅ 𝑩 → 𝑩 ≅ 𝑪 → 𝑨 ≅ 𝑪
+ ≅-trans {𝑨 = 𝑨}{𝑩}{𝑪} ab bc = f , g , α , β
+  where
    f1 : hom 𝑨 𝑩
    f1 = ∣ ab ∣
    f2 : hom 𝑩 𝑪
@@ -89,31 +84,23 @@ Fortunately, the lift operation preserves isomorphism (i.e., it's an *algebraic 
 
  open Lift
 
- module _ {𝓤 𝓦 : Level} where
+ Lift-≅ : {𝑨 : Algebra 𝓤 𝑆} → 𝑨 ≅ (Lift-alg 𝑨 𝓦)
+ Lift-≅ {𝓤}{𝓦}{𝑨} = 𝓁𝒾𝒻𝓉 , (𝓁ℴ𝓌ℯ𝓇{𝓤}{𝓦}{𝑨}) , happly lift∼lower , happly (lower∼lift{𝓦})
 
-  Lift-≅ : {𝑨 : Algebra 𝓤 𝑆} → 𝑨 ≅ (Lift-alg 𝑨 𝓦)
-  Lift-≅ {𝑨} = 𝓁𝒾𝒻𝓉 , (𝓁ℴ𝓌ℯ𝓇{𝓤}{𝓦}{𝑨}) , happly lift∼lower , happly (lower∼lift{𝓦})
+ Lift-hom : (𝓧 𝓨 : Level){𝑨 : Algebra 𝓤 𝑆}(𝑩 : Algebra 𝓦 𝑆) → hom 𝑨 𝑩 → hom (Lift-alg 𝑨 𝓧)(Lift-alg 𝑩 𝓨)
+ Lift-hom 𝓧 𝓨 {𝑨} 𝑩 (f , fhom) = lift ∘ f ∘ lower , γ
+  where
+  lABh : is-homomorphism (Lift-alg 𝑨 𝓧) 𝑩 (f ∘ lower)
+  lABh = ∘-is-hom (Lift-alg 𝑨 𝓧) 𝑩 {lower}{f} (λ _ _ → refl) fhom
 
-  Lift-hom : (𝓧 : Level)(𝓨 : Level){𝑨 : Algebra 𝓤 𝑆}(𝑩 : Algebra 𝓦 𝑆)
-   →             hom 𝑨 𝑩  →  hom (Lift-alg 𝑨 𝓧) (Lift-alg 𝑩 𝓨)
-
-  Lift-hom 𝓧 𝓨 {𝑨} 𝑩 (f , fhom) = lift ∘ f ∘ lower , γ
-   where
-   lABh : is-homomorphism (Lift-alg 𝑨 𝓧) 𝑩 (f ∘ lower)
-   lABh = ∘-is-hom (Lift-alg 𝑨 𝓧) 𝑩 {lower}{f} (λ _ _ → refl) fhom
-
-   γ : is-homomorphism(Lift-alg 𝑨 𝓧)(Lift-alg 𝑩 𝓨) (lift ∘ (f ∘ lower))
-   γ = ∘-is-hom (Lift-alg 𝑨 𝓧) (Lift-alg 𝑩 𝓨){f ∘ lower}{lift} lABh λ _ _ → refl
+  γ : is-homomorphism(Lift-alg 𝑨 𝓧)(Lift-alg 𝑩 𝓨) (lift ∘ (f ∘ lower))
+  γ = ∘-is-hom (Lift-alg 𝑨 𝓧) (Lift-alg 𝑩 𝓨){f ∘ lower}{lift} lABh λ _ _ → refl
 
 
- module _ {𝓤 𝓦 : Level} where
+ Lift-alg-iso : {𝓧 𝓨 : Level}{𝑨 : Algebra 𝓤 𝑆}{𝑩 : Algebra 𝓦 𝑆}
+  →             𝑨 ≅ 𝑩 → (Lift-alg 𝑨 𝓧) ≅ (Lift-alg 𝑩 𝓨)
 
-  Lift-alg-iso : {𝑨 : Algebra 𝓤 𝑆}{𝓧 : Level}
-                 {𝑩 : Algebra 𝓦 𝑆}{𝓨 : Level}
-                 -----------------------------------------
-   →             𝑨 ≅ 𝑩 → (Lift-alg 𝑨 𝓧) ≅ (Lift-alg 𝑩 𝓨)
-
-  Lift-alg-iso A≅B = ≅-trans (≅-trans (≅-sym Lift-≅) A≅B) Lift-≅
+ Lift-alg-iso A≅B = ≅-trans (≅-trans (≅-sym Lift-≅) A≅B) Lift-≅
 
 \end{code}
 
@@ -126,16 +113,14 @@ The lift is also associative, up to isomorphism at least.
 
 \begin{code}
 
- module _ {𝓘 𝓤 𝓦 : Level} where
+ Lift-alg-assoc : {𝓘 : Level}{𝑨 : Algebra 𝓤 𝑆} → Lift-alg 𝑨 (𝓦 ⊔ 𝓘) ≅ (Lift-alg (Lift-alg 𝑨 𝓦) 𝓘)
+ Lift-alg-assoc {𝓤}{𝓦}{𝓘} {𝑨} = ≅-trans (≅-trans γ Lift-≅) Lift-≅
+  where
+  γ : Lift-alg 𝑨 (𝓦 ⊔ 𝓘) ≅ 𝑨
+  γ = ≅-sym Lift-≅
 
-  Lift-alg-assoc : {𝑨 : Algebra 𝓤 𝑆} → Lift-alg 𝑨 (𝓦 ⊔ 𝓘) ≅ (Lift-alg (Lift-alg 𝑨 𝓦) 𝓘)
-  Lift-alg-assoc {𝑨} = ≅-trans (≅-trans γ Lift-≅) Lift-≅
-   where
-   γ : Lift-alg 𝑨 (𝓦 ⊔ 𝓘) ≅ 𝑨
-   γ = ≅-sym Lift-≅
-
-  Lift-alg-associative : (𝑨 : Algebra 𝓤 𝑆) → Lift-alg 𝑨 (𝓦 ⊔ 𝓘) ≅ (Lift-alg (Lift-alg 𝑨 𝓦) 𝓘)
-  Lift-alg-associative 𝑨 = Lift-alg-assoc {𝑨}
+ Lift-alg-associative : {𝓘 : Level}(𝑨 : Algebra 𝓤 𝑆) → Lift-alg 𝑨 (𝓦 ⊔ 𝓘) ≅ (Lift-alg (Lift-alg 𝑨 𝓦) 𝓘)
+ Lift-alg-associative 𝑨 = Lift-alg-assoc {𝑨 = 𝑨}
 
 \end{code}
 
@@ -148,7 +133,7 @@ Products of isomorphic families of algebras are themselves isomorphic. The proof
 
 \begin{code}
 
- module _ {𝓘 𝓤 𝓦 : Level}{I : Set 𝓘}{fe𝓘𝓤 : dfunext 𝓘 𝓤}{fe𝓘𝓦 : dfunext 𝓘 𝓦} where
+ module _ {𝓘 : Level}{I : Set 𝓘}{fe𝓘𝓤 : dfunext 𝓘 𝓤}{fe𝓘𝓦 : dfunext 𝓘 𝓦} where
 
   ⨅≅ : {𝒜 : I → Algebra 𝓤 𝑆}{ℬ : I → Algebra 𝓦 𝑆} → Π i ꞉ I , 𝒜 i ≅ ℬ i → ⨅ 𝒜 ≅ ⨅ ℬ
 
@@ -226,43 +211,31 @@ Finally, we prove some useful facts about embeddings that occasionally come in h
 
 \begin{code}
 
- module _ {𝓘 𝓤 𝓦 : Level} where
-
-  embedding-lift-nat : hfunext 𝓘 𝓤 → hfunext 𝓘 𝓦
-   →                   {I : Set 𝓘}{A : I → Set 𝓤}{B : I → Set 𝓦}
-                       (h : Nat A B) → (∀ i → is-embedding (h i))
-                       ------------------------------------------
-   →                   is-embedding(NatΠ h)
-
-  embedding-lift-nat hfiu hfiw h hem = NatΠ-is-embedding hfiu hfiw h hem
-
-
-  embedding-lift-nat' : hfunext 𝓘 𝓤 → hfunext 𝓘 𝓦
-   →                    {I : Set 𝓘}{𝒜 : I → Algebra 𝓤 𝑆}{ℬ : I → Algebra 𝓦 𝑆}
-                        (h : Nat(fst ∘ 𝒜)(fst ∘ ℬ)) → (∀ i → is-embedding (h i))
-                        --------------------------------------------------------
-   →                    is-embedding(NatΠ h)
-
-  embedding-lift-nat' hfiu hfiw h hem = NatΠ-is-embedding hfiu hfiw h hem
-
-
-  embedding-lift : hfunext 𝓘 𝓤 → hfunext 𝓘 𝓦
-   →               {I : Set 𝓘} → {𝒜 : I → Algebra 𝓤 𝑆}{ℬ : I → Algebra 𝓦 𝑆}
-   →               (h : ∀ i → ∣ 𝒜 i ∣ → ∣ ℬ i ∣) → (∀ i → is-embedding (h i))
-                   ----------------------------------------------------------
-   →               is-embedding(λ (x : ∣ ⨅ 𝒜 ∣) (i : I) → (h i)(x i))
-
-  embedding-lift hfiu hfiw {I}{𝒜}{ℬ} h hem = embedding-lift-nat' hfiu hfiw {I}{𝒜}{ℬ} h hem
-
-
- iso→embedding : {𝓤 𝓦 : Level}{𝑨 : Algebra 𝓤 𝑆}{𝑩 : Algebra 𝓦 𝑆}
-  →              (ϕ : 𝑨 ≅ 𝑩) → is-embedding (fst ∣ ϕ ∣)
-
- iso→embedding ϕ = equivs-are-embeddings (fst ∣ ϕ ∣)
-                    (invertibles-are-equivs (fst ∣ ϕ ∣) finv)
+ iso→embedding : {𝑨 : Algebra 𝓤 𝑆}{𝑩 : Algebra 𝓦 𝑆}(ϕ : 𝑨 ≅ 𝑩) → is-embedding (fst ∣ ϕ ∣)
+ iso→embedding ϕ = equivs-are-embeddings (fst ∣ ϕ ∣) (invertibles-are-equivs (fst ∣ ϕ ∣) finv)
   where
   finv : invertible (fst ∣ ϕ ∣)
   finv = ∣ fst ∥ ϕ ∥ ∣ , (snd ∥ snd ϕ ∥ , fst ∥ snd ϕ ∥)
+
+ module _ {𝓘 : Level}{I : Set 𝓘}{hiu : hfunext 𝓘 𝓤}{hiw : hfunext 𝓘 𝓦} where
+
+  embedding-lift-nat : {A : I → Set 𝓤}{B : I → Set 𝓦}(h : Nat A B)
+   →                   (∀ i → is-embedding (h i)) → is-embedding(NatΠ h)
+
+  embedding-lift-nat h hem = NatΠ-is-embedding hiu hiw h hem
+
+
+  embedding-lift-nat' : {𝒜 : I → Algebra 𝓤 𝑆}{ℬ : I → Algebra 𝓦 𝑆}(h : Nat(fst ∘ 𝒜)(fst ∘ ℬ))
+   →                    (∀ i → is-embedding (h i)) → is-embedding(NatΠ h)
+
+  embedding-lift-nat' h hem = NatΠ-is-embedding hiu hiw h hem
+
+
+  embedding-lift : {𝒜 : I → Algebra 𝓤 𝑆}{ℬ : I → Algebra 𝓦 𝑆}(h : ∀ i → ∣ 𝒜 i ∣ → ∣ ℬ i ∣)
+   →               (∀ i → is-embedding (h i)) → is-embedding(λ (x : ∣ ⨅ 𝒜 ∣) (i : I) → (h i)(x i))
+
+  embedding-lift {𝒜}{ℬ} h hem = embedding-lift-nat' {𝒜}{ℬ} h hem
+
 
 \end{code}
 
