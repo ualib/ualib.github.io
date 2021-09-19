@@ -43,6 +43,15 @@ of citation.
 **Author**. [William DeMeo][]  
 **Affiliation**. [Department of Algebra][], [Charles University in Prague][]
 
+
+<p>
+
+**DEPRECATED** This is the documentation for the old version of the Agda Universal Algebra Library.  For the lastest version, please go to:
+
+[https://ualib.github.io/agda-algebras](https://ualib.github.io/agda-algebras)
+
+</p>
+
 **Abstract**. The [Agda Universal Algebra Library][] ([UALib][]) is a library of types and programs (theorems and proofs) that formalizes the foundations of universal algebra in dependent type theory using the [Agda][] proof assistant language.
 
 In the latest version of the library we have defined many new types for representing the important constructs and theorems that comprise part of the foundations of general (universal) algebra and equational logic. These types are implemented in so called "literate" Agda files, with the `.lagda` extension, and they are grouped into modules so that they may be easily imported into other Agda programs.
@@ -65,18 +74,18 @@ We hope the library will be useful to mathematicians and computer scientists who
 
 <pre class="Agda">
 
-<a id="3629" class="Symbol">{-#</a> <a id="3633" class="Keyword">OPTIONS</a> <a id="3641" class="Pragma">--without-K</a> <a id="3653" class="Pragma">--exact-split</a> <a id="3667" class="Pragma">--safe</a> <a id="3674" class="Symbol">#-}</a>
+<a id="3862" class="Symbol">{-#</a> <a id="3866" class="Keyword">OPTIONS</a> <a id="3874" class="Pragma">--without-K</a> <a id="3886" class="Pragma">--exact-split</a> <a id="3900" class="Pragma">--safe</a> <a id="3907" class="Symbol">#-}</a>
 
-<a id="3679" class="Keyword">module</a> <a id="3686" href="UALib.html" class="Module">UALib</a> <a id="3692" class="Keyword">where</a>
+<a id="3912" class="Keyword">module</a> <a id="3919" href="UALib.html" class="Module">UALib</a> <a id="3925" class="Keyword">where</a>
 
-<a id="3699" class="Keyword">open</a> <a id="3704" class="Keyword">import</a> <a id="3711" href="Preface.html" class="Module">Preface</a>
-<a id="3719" class="Keyword">open</a> <a id="3724" class="Keyword">import</a> <a id="3731" href="Overture.html" class="Module">Overture</a>
-<a id="3740" class="Keyword">open</a> <a id="3745" class="Keyword">import</a> <a id="3752" href="Relations.html" class="Module">Relations</a>
-<a id="3762" class="Keyword">open</a> <a id="3767" class="Keyword">import</a> <a id="3774" href="Algebras.html" class="Module">Algebras</a>
-<a id="3783" class="Keyword">open</a> <a id="3788" class="Keyword">import</a> <a id="3795" href="Homomorphisms.html" class="Module">Homomorphisms</a>
-<a id="3809" class="Keyword">open</a> <a id="3814" class="Keyword">import</a> <a id="3821" href="Terms.html" class="Module">Terms</a>
-<a id="3827" class="Keyword">open</a> <a id="3832" class="Keyword">import</a> <a id="3839" href="Subalgebras.html" class="Module">Subalgebras</a>
-<a id="3851" class="Keyword">open</a> <a id="3856" class="Keyword">import</a> <a id="3863" href="Varieties.html" class="Module">Varieties</a>
+<a id="3932" class="Keyword">open</a> <a id="3937" class="Keyword">import</a> <a id="3944" href="Preface.html" class="Module">Preface</a>
+<a id="3952" class="Keyword">open</a> <a id="3957" class="Keyword">import</a> <a id="3964" href="Overture.html" class="Module">Overture</a>
+<a id="3973" class="Keyword">open</a> <a id="3978" class="Keyword">import</a> <a id="3985" href="Relations.html" class="Module">Relations</a>
+<a id="3995" class="Keyword">open</a> <a id="4000" class="Keyword">import</a> <a id="4007" href="Algebras.html" class="Module">Algebras</a>
+<a id="4016" class="Keyword">open</a> <a id="4021" class="Keyword">import</a> <a id="4028" href="Homomorphisms.html" class="Module">Homomorphisms</a>
+<a id="4042" class="Keyword">open</a> <a id="4047" class="Keyword">import</a> <a id="4054" href="Terms.html" class="Module">Terms</a>
+<a id="4060" class="Keyword">open</a> <a id="4065" class="Keyword">import</a> <a id="4072" href="Subalgebras.html" class="Module">Subalgebras</a>
+<a id="4084" class="Keyword">open</a> <a id="4089" class="Keyword">import</a> <a id="4096" href="Varieties.html" class="Module">Varieties</a>
 
 </pre>
 
